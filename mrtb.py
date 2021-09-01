@@ -1,15 +1,17 @@
 from configparser import ConfigParser
 import json
 
-from dask.bytes.tests.test_http import requests
+import requests
 from helium import *
 import time
 from selenium import webdriver
-
+from selenium.webdriver.chrome.options import Options
 class TB():
     def __init__(self,path):
         self.path = path
         self.ReadConf()
+        self.chrome_options = Options()
+        self.chrome_options.add_argument('--headless')
 
     def ReadConf(self):
         cf = ConfigParser()
@@ -30,7 +32,7 @@ class TB():
 
     def run(self):
         for i in self.message:
-            driver = webdriver.Chrome(executable_path = self.chromeDriverPath)
+            driver = webdriver.Chrome(executable_path = self.chromeDriverPath,options = self.chrome_options)
             driver.get(self.url)
             set_driver(driver)
             try:
