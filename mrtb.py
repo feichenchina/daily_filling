@@ -1,7 +1,7 @@
 from configparser import ConfigParser
 import json
 
-from dask.bytes.tests.test_http import requests
+import requests
 from helium import *
 import time
 from selenium import webdriver
