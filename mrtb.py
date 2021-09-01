@@ -79,7 +79,7 @@ class TB():
                 local_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                 msg = f"填报于 {local_time} 失败，请检查程序"
             driver.close()
-            self.send_msg(i.get("tel"),msg)
+            # self.send_msg(i.get("tel"),msg)
 
     def send_msg(self,phone,msg):
         headers = {'Content-Type': 'application/json;charset=utf-8'}
