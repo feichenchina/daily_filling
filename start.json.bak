@@ -1,0 +1,9 @@
+{
+    "apps": {
+        "name": "tb",
+        "script": "mrtb.py",
+        "cwd": "./",
+        "interpreter": "python",
+        "args": ""
+    }
+}

@@ -1,11 +1,12 @@
 from configparser import ConfigParser
-import json
-
+import json,schedule
+import datetime
 import requests
 from helium import *
 import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+import os
 class TB():
     def __init__(self,path):
         self.path = path
@@ -20,6 +21,7 @@ class TB():
         self.chromeDriverPath = cf.get("JC", "chromedriver")
         self.url = cf.get("JC", "url")
         self.dd = cf.get("JC", "dd")
+        self.time = cf.get("TIME", "run")
         message = cf.get("TB", "message")
         message = json.loads(message)
         self.message = list(map(self.DealMessage,message))
@@ -99,7 +101,32 @@ class TB():
         r = requests.post(self.dd, data=json.dumps(data), headers=headers)
         return r.text
 
+    def job(self):
+
+        print('Job5:每隔5秒到10秒执行一次，每次执行3秒')
+        print('Job5-startTime:%s' % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+        time.sleep(3)
+        print('Job5-endTime:%s' % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+        print('------------------------------------------------------------------------')
+
 if __name__ == '__main__':
     path = "Tb.conf"
     tb = TB(path)
-    tb.run()
+    job = schedule.every().day.at(tb.time).do(tb.job)
+    while True:
+        schedule.run_pending()
+        time.sleep(5)
+        name = copy(tb.time)
+        tb.ReadConf()
+        print(name,tb.time)
+        if (name != tb.time):
+            print("进入取消行列")
+            schedule.cancel_job(job)
+        all_jobs = schedule.get_jobs()
+        print(all_jobs)
+        if not len(all_jobs):
+            break
+    pwd = os.getcwd()
+    os.system(f"cd {pwd} && python mrtb.py")
+
+

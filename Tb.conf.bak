@@ -1,7 +1,10 @@
 [JC]
 password =
 chromedriver = C:\Program Files\Google\Chrome\Application\chromedriver.exe
-url = https://to3bh0ij7c.jiandaoyun.com/f/5e316fae5309b8000683567d
+url = 
 
 [TB]
 message = [{"tel" : "","add" : "管城区","mes" : ""},{"tel" : "","add" : "","mes" : ""},{"tel" : "","add" : "","mes" : ""}]
+
+[TIME]
+run=17:04
