@@ -11,8 +11,8 @@ class TB():
     def __init__(self,path):
         self.path = path
         self.ReadConf()
-        self.chrome_options = Options()
-        self.chrome_options.add_argument('--headless')
+        # self.chrome_options = Options()
+        # self.chrome_options.add_argument('--headless')
 
     def ReadConf(self):
         cf = ConfigParser()
@@ -34,7 +34,7 @@ class TB():
 
     def run(self):
         for i in self.message:
-            driver = webdriver.Chrome(executable_path = self.chromeDriverPath,options = self.chrome_options)
+            driver = webdriver.Chrome(executable_path = self.chromeDriverPath)
             driver.get(self.url)
             set_driver(driver)
             try:
@@ -60,7 +60,8 @@ class TB():
                 click("提交")
                 time.sleep(1)
                 start_time = time.time()
-                exist = S("body > div:nth-child(14) > div > div > div > div")
+                exist = driver.find_element_by_xpath('//div[@class="field-invalid-info"]/../../div[1]').text
+                print("判断文本:",exist)
                 local_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                 msg = f"填报于 {local_time} 失败，请检查程序"
                 while True:
@@ -71,17 +72,22 @@ class TB():
                         local_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                         msg = f"填报于 {local_time} 成功执行"
                         break
-                    if exist.exists():
+                    if Text("此项内容已存在").exists():
                         local_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                         msg = f"填报于 {local_time} 重复执行"
+                        break
+                    if Text("请填写").exists():
+                        local_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+                        msg = f"填报于 {local_time} ，参数  {exist}  未填写"
                         break
                     time.sleep(0.5)
             except Exception as e:
                 print("判断发生异常",e)
                 local_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                 msg = f"填报于 {local_time} 失败，请检查程序"
+            print(msg)
             driver.close()
-            # self.send_msg(i.get("tel"),msg)
+            self.send_msg(i.get("tel"),msg)
 
     def send_msg(self,phone,msg):
         headers = {'Content-Type': 'application/json;charset=utf-8'}
@@ -102,16 +108,18 @@ class TB():
         return r.text
 
     def job(self):
-
         print('Job5:每隔5秒到10秒执行一次，每次执行3秒')
         print('Job5-startTime:%s' % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
         time.sleep(3)
         print('Job5-endTime:%s' % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
         print('------------------------------------------------------------------------')
+        self.run()
+
 
 if __name__ == '__main__':
     path = "Tb.conf"
     tb = TB(path)
+    # tb.run()
     job = schedule.every().day.at(tb.time).do(tb.job)
     while True:
         schedule.run_pending()
