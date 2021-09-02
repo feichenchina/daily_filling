@@ -129,4 +129,3 @@ if __name__ == '__main__':
     pwd = os.getcwd()
     os.system(f"cd {pwd} && python mrtb.py")
 
-
