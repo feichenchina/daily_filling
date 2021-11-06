@@ -60,12 +60,15 @@ class TB():
                 click("提交")
                 time.sleep(1)
                 start_time = time.time()
-                exist = driver.find_element_by_xpath('//div[@class="field-invalid-info"]/../../div[1]').text
-                print("判断文本:",exist)
                 local_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                 msg = f"填报于 {local_time} 失败，请检查程序"
                 while True:
                     end_time = time.time()
+                    ex = ""
+                    try:
+                        ex = driver.find_element_by_xpath("//div[@class='x-msg-toast-container top-right']/div").text
+                    except Exception as e:
+                        print("找元素出现问题")
                     if end_time - start_time >= 10:
                         break
                     if Text("提交成功").exists():
@@ -76,7 +79,18 @@ class TB():
                         local_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                         msg = f"填报于 {local_time} 重复执行"
                         break
+                    if ex:
+                        local_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+                        msg = f"填报于 {local_time} 重复执行,消息提示为：参数错误请刷新页面或今日已填报！"
+                        break
+                    if Text("今日已填报").exists():
+                        local_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+                        msg = f"填报于 {local_time} 重复执行"
+                        break
                     if Text("请填写").exists():
+                        print("进入")
+                        exist = driver.find_element_by_xpath('//div[@class="field-invalid-info"]/../../div[1]').text
+                        print("判断文本:", exist)
                         local_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                         msg = f"填报于 {local_time} ，参数  {exist}  未填写"
                         break
@@ -107,27 +121,37 @@ class TB():
         r = requests.post(self.dd, data=json.dumps(data), headers=headers)
         return r.text
 
-    def job(self):
-        print('Job5:每隔5秒到10秒执行一次，每次执行3秒')
-        print('Job5-startTime:%s' % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
-        time.sleep(3)
-        print('Job5-endTime:%s' % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
-        print('------------------------------------------------------------------------')
-        self.run()
+def conf(path):
+    cf1 = ConfigParser()
+    cf1.read(path, encoding="utf-8")
+    time_res = cf1.get("TIME", "run")
+    return time_res
+
+def job():
+    print('Job5:每隔5秒到10秒执行一次，每次执行3秒')
+    print('Job5-startTime:%s' % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+    time.sleep(3)
+    print('Job5-endTime:%s' % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+    print('------------------------------------------------------------------------')
+    path = "Tb.conf"
+    tb = TB(path)
+    tb.run()
 
 
 if __name__ == '__main__':
-    path = "Tb.conf"
-    tb = TB(path)
+    # path = "Tb.conf"
+    # tb = TB(path)
     # tb.run()
-    job = schedule.every().day.at(tb.time).do(tb.job)
+    path = "Tb.conf"
+    time_res = conf(path)
+    job = schedule.every().day.at(time_res).do(job)
     while True:
         schedule.run_pending()
         time.sleep(5)
-        name = copy(tb.time)
-        tb.ReadConf()
-        print(name,tb.time)
-        if (name != tb.time):
+        name = copy(time_res)
+        time_res = conf(path)
+        print(name,time_res)
+        if (name != time_res):
             print("进入取消行列")
             schedule.cancel_job(job)
         all_jobs = schedule.get_jobs()

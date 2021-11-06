@@ -2,6 +2,7 @@
 password =
 chromedriver = C:\Program Files\Google\Chrome\Application\chromedriver.exe
 url =
+dd =
 
 [TB]
 message = [{"tel" : "","add" : "管城区","mes" : ""},{"tel" : "","add" : "","mes" : ""},{"tel" : "","add" : "","mes" : ""}]
