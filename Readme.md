@@ -16,5 +16,6 @@ dd : 钉钉秘钥
 updateAbsPath 想要安装或替换的文件路径
 addAbsPath  想要安装的目录路径
 
+运行 autoUpdate.exe 文件
 ```
 
